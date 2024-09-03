@@ -26,7 +26,23 @@ resource "aws_instance" "blog" {
     Name = "HelloWorld"
   }
 
-  vpc_security_group_ids = [aws_security_group.blog.id]
+  vpc_security_group_ids = [module.blog_sg.security-security_group_id]
+}
+
+module "blog_sg" {
+  source = "terraform-aws-modules/security-group/aws"
+  version = "4.13.0"
+  name = "blog_new"
+
+  vpc_id = data.aws.vpc.default.id
+  
+  ingress_rules = ["http-80-tcp", "https-443-tcp"]
+  ingress_cidr_blocks = ["0.0.0.0/0"]
+
+  egress_rules = ["all-all"]
+  egress_cidr_blocks = ["0.0.0.0/0"]
+
+
 }
 
 resource "aws_security_group" "blog" {
