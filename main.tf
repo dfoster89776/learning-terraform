@@ -62,7 +62,7 @@ resource "aws_lb_target_group" "blog_tg" {
 resource "aws_lb_listener" "blog_listener" {
   load_balancer_arn = module.blog_alb.arn
   port              = "80"
-  protocol          = "HTTP"
+  protocol          = "TCP"
   alpn_policy       = "HTTP2Preferred"
 
   default_action {
