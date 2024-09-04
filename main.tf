@@ -61,7 +61,7 @@ resource "aws_lb_target_group" "blog_tg" {
 
 module "blog_alb" {
   source = "terraform-aws-modules/alb/aws"
-
+  load_balancer_type = "network"
   enable_deletion_protection = false
 
   name    = "blog-alb"
@@ -70,13 +70,16 @@ module "blog_alb" {
 
   security_groups = [module.blog_sg.security_group_id]
 
-  http_tcp_listeners = [
-    {
-      port               = 80
-      protocol           = "HTTP"
-      target_group_index = 0
+  listeners = {
+    ex-http = {
+      port            = 80
+      protocol        = "HTTP"
+
+      forward = {
+        target_group_key = "blog_tg"
+      }
     }
-  ]
+  }
 
   tags = {
     Environment = "Development"
