@@ -49,6 +49,8 @@ module "blog_as" {
 
 }
 
+
+
 module "blog_alb" {
   source = "terraform-aws-modules/alb/aws"
 
@@ -59,17 +61,6 @@ module "blog_alb" {
   subnets = module.blog_vpc.public_subnets
 
   security_groups = [module.blog_sg.security_group_id]
-
-  
-  listeners = {
-    ex-http = {
-      port     = 80
-      protocol = "HTTP"
-      forward = {
-        target_group_arn = module.blog_as.autoscaling_group_arn
-      }
-    }
-  }
 
 
   tags = {
