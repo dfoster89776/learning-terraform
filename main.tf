@@ -50,7 +50,6 @@ module "blog_as" {
 }
 
 
-
 module "blog_alb" {
   source = "terraform-aws-modules/alb/aws"
 
