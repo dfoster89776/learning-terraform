@@ -53,7 +53,7 @@ module "blog_as" {
 
 resource "aws_lb_target_group" "blog_tg" {
   name        = "blog-tg"
-  target_type = "alb"
+  target_type = "instance"
   port        = 80
   protocol    = "TCP"
   vpc_id      = module.blog_vpc.vpc_id
