@@ -44,7 +44,7 @@ module "blog_as" {
   vpc_zone_identifier = module.blog_vpc.public_subnets
   security_groups = [module.blog_sg.security_group_id]
 
-  target_group_arns  = [blog_tg.arn]
+  target_group_arns  = [aws_lb_target_group.blog_tg.arn]
 
   image_id           = data.aws_ami.app_ami.id
   instance_type = var.instance_type
