@@ -60,10 +60,8 @@ module "alb" {
     ex-http-https-redirect = {
       port     = 80
       protocol = "HTTP"
-      redirect = {
-        port        = "443"
-        protocol    = "HTTPS"
-        status_code = "HTTP_301"
+      forward = {
+        target_group_key = "ex-instance"
       }
     }
   }
