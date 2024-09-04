@@ -44,11 +44,20 @@ module "blog_as" {
   vpc_zone_identifier = module.blog_vpc.public_subnets
   security_groups = [module.blog_sg.security_group_id]
 
+  target_group_arns = resource.blog_tg.arn
+
   image_id           = data.aws_ami.app_ami.id
   instance_type = var.instance_type
 
 }
 
+resource "aws_lb_target_group" "blog_tg" {
+  name        = "blog-tg"
+  target_type = "alb"
+  port        = 80
+  protocol    = "TCP"
+  vpc_id      = module.blog_vpc.vpc_id
+}
 
 module "blog_alb" {
   source = "terraform-aws-modules/alb/aws"
