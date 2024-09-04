@@ -59,6 +59,18 @@ resource "aws_lb_target_group" "blog_tg" {
   vpc_id      = module.blog_vpc.vpc_id
 }
 
+resource "aws_lb_listener" "blog_listener" {
+  load_balancer_arn = module.blog_alb.arn
+  port              = "80"
+  protocol          = "HTTP"
+  alpn_policy       = "HTTP2Preferred"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.blog_tg.arn
+  }
+}
+
 module "blog_alb" {
   source = "terraform-aws-modules/alb/aws"
   load_balancer_type = "network"
@@ -69,11 +81,6 @@ module "blog_alb" {
   subnets = module.blog_vpc.public_subnets
 
   security_groups = [module.blog_sg.security_group_id]
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.blog_tg.arn
-  }
 
   tags = {
     Environment = "Development"
