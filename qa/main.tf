@@ -6,6 +6,6 @@ module "qa" {
         network_prefix = "10.1"
     }
 
-    asg.min_size = 1
-    asg.max_size = 1
+    blog_as.min_size = 1
+    blog_as.max_size = 1
 }
