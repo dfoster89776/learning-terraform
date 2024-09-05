@@ -3,7 +3,7 @@ data "aws_ami" "app_ami" {
 
   filter {
     name   = "name"
-    values = ["bitnami-tomcat-*-x86_64-hvm-ebs-nami"]
+    values = ["var.ami_filter.name]
   }
 
   filter {
@@ -11,7 +11,7 @@ data "aws_ami" "app_ami" {
     values = ["hvm"]
   }
 
-  owners = ["979382823631"] # Bitnami
+  owners = [var.ami_filter.owner] # Bitnami
 }
 
 data "aws_vpc" "default" {
@@ -21,11 +21,11 @@ data "aws_vpc" "default" {
 module "blog_vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
-  name = "dev"
-  cidr = "10.0.0.0/16"
+  name = var.environment.name
+  cidr = "${var.environment.network_prefix}.0.0/16"
 
   azs             = ["us-west-2a", "us-west-2b", "us-west-2c"]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+  public_subnets  = ["{var.environment.network_prefix}.101.0/24", "{var.environment.network_prefix}.102.0/24", "{var.environment.network_prefix}.103.0/24"]
 
   tags = {
     Terraform = "true"
@@ -37,9 +37,9 @@ module "blog_as" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "7.7.0"
   
-  name = "blog"
-  min_size = 1
-  max_size = 3
+  name = "${var.environment.name}-blog"
+  min_size = var.min_size
+  max_size = var.max_size
   
   vpc_zone_identifier = module.blog_vpc.public_subnets
   security_groups = [module.blog_sg.security_group_id]
@@ -52,7 +52,7 @@ module "blog_as" {
 }
 
 resource "aws_lb_target_group" "blog_tg" {
-  name        = "blog-tg"
+  name        = "${var.environment.name}-blog-tg"
   target_type = "instance"
   port        = 80
   protocol    = "TCP"
@@ -75,21 +75,21 @@ module "blog_alb" {
   load_balancer_type = "network"
   enable_deletion_protection = false
 
-  name    = "blog-alb"
+  name    = "${var.environment.name}-blog-alb"
   vpc_id  = module.blog_vpc.vpc_id
   subnets = module.blog_vpc.public_subnets
 
   security_groups = [module.blog_sg.security_group_id]
 
   tags = {
-    Environment = "Development"
+    Environment = var.environment.name
   }
 }
 
 module "blog_sg" {
   source = "terraform-aws-modules/security-group/aws"
   version = "4.13.0"
-  name = "blog"
+  name = "${var.environment.name}-blog"
 
   vpc_id = module.blog_vpc.vpc_id
   
